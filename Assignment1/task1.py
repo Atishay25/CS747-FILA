@@ -61,23 +61,44 @@ class Eps_Greedy(Algorithm):
 
 # START EDITING HERE
 # You can use this space to define any helper functions that you need
+# KL function used for KL-UCB
+def KL(x,y):
+    y1 = y - 1e-10
+    y2 = y + 1e-10
+    if x == 0:
+        return (1-x)*math.log((1-x)/(1-y1))
+    elif x == 1:
+        return x*math.log(x/y2)
+    else:       
+        return x*math.log(x/y2) + (1-x)*math.log((1-x)/(1-y1))
 # END EDITING HERE
 
 class UCB(Algorithm):
     def __init__(self, num_arms, horizon):
         super().__init__(num_arms, horizon)
         # START EDITING HERE
+        self.ucb = np.zeros(num_arms)       # Array for UCB values for each arm 
+        self.values = np.zeros(num_arms)    # Empirical mean of rewards for each arm
+        self.count = np.zeros(num_arms)     # Number of times each arm has been sampled
+        self.time = 0                       # Variable to keep track of time
         # END EDITING HERE
     
     def give_pull(self):
         # START EDITING HERE
-        raise NotImplementedError
+        return np.argmax(self.ucb)
         # END EDITING HERE  
         
     
     def get_reward(self, arm_index, reward):
         # START EDITING HERE
-        raise NotImplementedError
+        self.time += 1
+        self.count[arm_index] += 1
+        n = self.count[arm_index]
+        value = self.values[arm_index]
+        new_value = ((n - 1) / n) * value + (1 / n) * reward
+        self.values[arm_index] = new_value
+        for arm in range(self.num_arms):
+            self.ucb[arm] = self.values[arm] + math.sqrt((2*math.log(self.time))/(self.count[arm]+1e-6))
         # END EDITING HERE
 
 
@@ -86,17 +107,54 @@ class KL_UCB(Algorithm):
         super().__init__(num_arms, horizon)
         # You can add any other variables you need here
         # START EDITING HERE
-
+        self.klucb = np.zeros(num_arms)         # Array for KL-UCB values for each arm 
+        self.values = np.zeros(num_arms)        # Empirical mean of rewards for each arm
+        self.count = np.zeros(num_arms)         # Number of times each arm has been sampled
+        self.time = 0                           # Variable to keep track of time
+        self.c = 0                              # KL_UCB parameter c, using c = 0
         # END EDITING HERE
     
     def give_pull(self):
         # START EDITING HERE
-        raise NotImplementedError
+        self.time +=  1
+        # wanted = math.log(self.time + 1e-6) + self.c * math.log(math.log(self.time + 1e-6))
+        wanted = math.log(self.time)        # as I am using c = 0, wanted term is this itself
+        for arm in range(self.num_arms):
+            q_vals = np.arange(self.values[arm],1,0.01)     # taking precision of 0.01 in binary search
+            l = 0
+            r = len(q_vals) - 1
+            if(r == -1):
+                self.klucb[arm] = 1
+                continue
+            mid = (l+r)//2
+            q = 0
+            while l <= r:       # USING BINARY SEARCH
+                mid = (l+r)//2
+                if (self.count[arm] * KL(self.values[arm],q_vals[mid]) <= wanted):
+                    q = q_vals[mid]
+                    l = mid + 1
+                else:
+                    r = mid - 1
+            self.klucb[arm] = q 
+            # l = self.values[arm]          # USING BISECTION METHOD
+            # r = 1
+            # while abs(l-r) > 1e-2:
+            #     mid = (l+r)/2
+            #     if (self.count[arm] * KL(self.values[arm],mid) <= wanted):
+            #         l = mid
+            #     else:
+            #         r = mid
+            # self.klucb[arm] = l
+        return np.argmax(self.klucb)
         # END EDITING HERE
     
     def get_reward(self, arm_index, reward):
         # START EDITING HERE
-        raise NotImplementedError
+        self.count[arm_index] += 1
+        n = self.count[arm_index]
+        value = self.values[arm_index]
+        new_value = ((n - 1) / n) * value + (1 / n) * reward
+        self.values[arm_index] = new_value
         # END EDITING HERE
 
 class Thompson_Sampling(Algorithm):
@@ -104,15 +162,22 @@ class Thompson_Sampling(Algorithm):
         super().__init__(num_arms, horizon)
         # You can add any other variables you need here
         # START EDITING HERE
-        
+        self.values = np.zeros(num_arms)        # Array of sample drawn for each arm from beta distribution
+        self.success = np.zeros(num_arms)       # Number of successes for each arm 
+        self.fail = np.zeros(num_arms)          # Number of failures for each arm
         # END EDITING HERE
     
     def give_pull(self):
         # START EDITING HERE
-        raise NotImplementedError
+        for arm in range(self.num_arms):
+            self.values[arm] = np.random.beta(self.success[arm] + 1, self.fail[arm] + 1)
+        return np.argmax(self.values)
         # END EDITING HERE
     
     def get_reward(self, arm_index, reward):
         # START EDITING HERE
-        raise NotImplementedError
+        if reward == 0:
+            self.fail[arm_index] += 1
+        else:
+            self.success[arm_index] += 1
         # END EDITING HERE

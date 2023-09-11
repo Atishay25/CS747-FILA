@@ -1,0 +1,8 @@
+# Plotting for task 2
+- https://www.geeksforgeeks.org/matplotlib-pyplot-legend-in-python/
+- https://stackoverflow.com/questions/22276066/how-to-plot-multiple-functions-on-the-same-figure
+
+# Just for reading more about implementation of UCB 
+- https://medium.com/analytics-vidhya/multi-armed-bandit-analysis-of-upper-confidence-bound-algorithm-4b84be516047
+
+# I used class slides 3,4,5 also extensively for Thompson Sampling equations, lower bounds etc

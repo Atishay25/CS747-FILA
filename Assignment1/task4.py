@@ -34,16 +34,26 @@ class MultiBanditsAlgo:
         self.num_arms = num_arms
         self.horizon = horizon
         # START EDITING HERE
-        
+        self.values = np.zeros((2,num_arms))
+        self.success = np.zeros((2,num_arms))
+        self.fail = np.zeros((2,num_arms))
         # END EDITING HERE
     
     def give_pull(self):
         # START EDITING HERE
-        raise NotImplementedError
+        # THOMPSON SAMPLING WITH AVERAGING FOR BOTH BANDIT INSTANCES
+        for i in range(2):
+            for arm in range(self.num_arms):
+                self.values[i][arm] = np.random.beta(self.success[i][arm] + 1, self.fail[i][arm] + 1)
+        val = (self.values[0] + self.values[1])/2           # Taking average of both samples for each arm
+        return np.argmax(val)
         # END EDITING HERE
     
     def get_reward(self, arm_index, set_pulled, reward):
         # START EDITING HERE
-        raise NotImplementedError
+        if reward == 0:
+            self.fail[set_pulled][arm_index] += 1
+        else:
+            self.success[set_pulled][arm_index] += 1
         # END EDITING HERE
 

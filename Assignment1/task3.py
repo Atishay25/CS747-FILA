@@ -31,16 +31,33 @@ class FaultyBanditsAlgo:
         self.horizon = horizon
         self.fault = fault # probability that the bandit returns a faulty pull
         # START EDITING HERE
-
+        self.values = np.zeros(num_arms)
+        self.success = np.zeros(num_arms)
+        self.fail = np.zeros(num_arms)
         # END EDITING HERE
     
     def give_pull(self):
         # START EDITING HERE
-        raise NotImplementedError
+        # using thompson sampling with samples taken in range [p/2,1-p/2]
+        for arm in range(self.num_arms):
+            self.values[arm] = np.random.beta(self.success[arm] + 1, self.fail[arm] + 1)
+            #while 1:
+            #    if (self.values[arm] <= (1-(self.fault/2)) and self.values[arm] >= (self.fault)/2):
+            #        break
+            #    self.values[arm] = np.random.beta(self.success[arm] + 1, self.fail[arm] + 1)
+        return np.argmax(self.values)
         # END EDITING HERE
     
     def get_reward(self, arm_index, reward):
         # START EDITING HERE
-        raise NotImplementedError
+        # NORMAL THOMPSON
+        if reward == 0:
+            self.fail[arm_index] += 9/8
+            self.success[arm_index] -= 1/8
+        else:
+            self.success[arm_index] += 9/8
+            self.fail[arm_index] -= 1/8
+        self.success[arm_index] = max(0,self.success[arm_index])
+        self.fail[arm_index] = max(0,self.fail[arm_index])
         #END EDITING HERE
 

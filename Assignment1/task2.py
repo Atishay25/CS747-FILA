@@ -10,6 +10,16 @@ from task1 import Eps_Greedy, UCB, KL_UCB
 import matplotlib.pyplot as plt
 # START EDITING HERE
 # You can use this space to define any helper functions that you need.
+import math
+def KL(x,y):
+    y1 = y - 1e-10
+    y2 = y + 1e-10
+    if x == 0:
+        return (1-x)*math.log((1-x)/(1-y1))
+    elif x == 1:
+        return x*math.log(x/y2)
+    else:       
+        return x*math.log(x/y2) + (1-x)*math.log((1-x)/(1-y1))
 # END EDITING HERE
 
 class BernoulliArmTask2:
@@ -76,10 +86,73 @@ def task2(algorithm, horizon, p1s, p2s, num_sims=50):
     return regrets
 
 if __name__ == '__main__':
-  # EXAMPLE CODE
-  task2p1s = [0.2, 0.3]
-  task2p2s = [0.1, 0.2]
-  regrets = task2(Eps_Greedy, 1000, task2p1s, task2p2s, 1)
-  print(regrets)
   # INSERT YOUR CODE FOR PLOTTING HERE
-  pass
+  # TASK2 (A)
+  p1 = 0.9
+  task2p2s = np.arange(0,p1+0.01,0.05)
+  task2p1s = p1 * np.ones(len(task2p2s))
+
+  regrets2a = task2(UCB, 30000, task2p1s, task2p2s, 50)
+
+  fig2a, ax = plt.subplots(figsize=(10, 6))
+  ax.plot(task2p2s, regrets2a, marker='o', linestyle='-', color='b', label="UCB")
+  ax.set_title("Task2A: Variation of Regret with p2", fontsize=14)
+  ax.set_xlabel("p2 (Mean of the second arm)", fontsize=12)
+  ax.set_ylabel("Regret", fontsize=12)
+  ax.grid(True, linestyle='--', alpha=0.6)
+  ax.tick_params(axis='both', which='major', labelsize=10)
+  plt.legend()
+  plt.savefig("task2a.png")
+  plt.show()
+
+  # TASK 2 (B)
+  task2p1sb = 0.1 + task2p2s
+  regrets_ucb = task2(UCB, 30000, task2p1sb, task2p2s, 50)
+  regrets_klucb = task2(KL_UCB, 30000, task2p1sb, task2p2s, 50)
+
+  fig2b1, axb1 = plt.subplots(figsize=(10, 6))
+  axb1.plot(task2p2s, regrets_ucb, marker='o', linestyle='-', color='b', label="UCB")
+  axb1.set_title("Task2B: Variation of Regret with p2 for UCB", fontsize=14)
+  axb1.set_xlabel("p2 (Mean of the second arm)", fontsize=12)
+  axb1.set_ylabel("Regret", fontsize=12)
+  axb1.grid(True, linestyle='--', alpha=0.6)
+  axb1.tick_params(axis='both', which='major', labelsize=10)
+  plt.legend()
+  plt.savefig("task2b_ucb.png")
+  plt.show()
+
+  fig2b2, axb2 = plt.subplots(figsize=(10, 6))
+  axb2.plot(task2p2s, regrets_klucb,label='KL-UCB', marker='o', linestyle='-', color='b')
+  axb2.set_title("Task2B: Variation of Regret with p2 for KL-UCB", fontsize=14)
+  axb2.set_xlabel("p2 (Mean of the second arm)", fontsize=12)
+  axb2.set_ylabel("Regret", fontsize=12)
+  axb2.grid(True, linestyle='--', alpha=0.6)
+  axb2.tick_params(axis='both', which='major', labelsize=10)
+  plt.legend()
+  plt.savefig("task2b_klucb.png")
+  plt.show()
+  
+  # Additional plot for part (b) KLUCB plot, with Lower bounds also plotted
+  # lower_bound = np.zeros(len(task2p1s))
+  # lower_bound = [0.1/KL(task2p1sb[i], task2p2s[i]) for i in range(len(task2p1s))]
+  # fig2b3, axb3 = plt.subplots(figsize=(10, 6))
+  # axb3.plot(task2p2s, regrets_klucb,label='Regret', marker='o', linestyle='-', color='b')
+  # axb3.plot(task2p2s, lower_bound,label='Lower Bound', marker='o', linestyle='-', color='r')
+  # axb3.set_title("Task2B: Variation of Regret with p2 for KL-UCB", fontsize=14)
+  # axb3.set_xlabel("p2 (Mean of the second arm)", fontsize=12)
+  # axb3.set_ylabel("Regret", fontsize=12)
+  # axb3.grid(True, linestyle='--', alpha=0.6)
+  # axb3.tick_params(axis='both', which='major', labelsize=10)
+  # plt.legend()
+  # plt.savefig("task2b_klucb_with_lowerbound.png")
+  # plt.show()
+
+  # Uncomment these lines for printing the values
+  #print("TASK 2A :")
+  #for i in range(len(task2p2s)):
+  #  print(f"P1: {task2p1s[i]},\t P2: {round(task2p2s[i],2)},\t REGRET: {regrets2a[i]}")
+  #print("TASK 2B :")
+  #for i in range(len(task2p2s)):
+  #  print(f"P1: {task2p1sb[i]},\t P2: {round(task2p2s[i],2)},\t REGRET_UCB: {regrets_ucb[i]}, \t REGRET_KLUCB: {regrets_klucb[i]}")
+
+
