@@ -16,7 +16,7 @@ args = parser.parse_args()
 p = args.p
 q = args.q
 numSquares = 16
-numStates = 2*(numSquares**3) + 1 
+numStates = (numSquares**3) + 1 
 numActions = 10
 endStates = [numStates-1]
 mdptype = "episodic"
@@ -42,7 +42,8 @@ with open(args.opponent, 'r') as fp:
         d = line.split()
         if d[0] == "state":
             continue
-        opponent_policy[d[0]] = [float(d[i]) for i in range(1,5)]
+        if d[0][6] == "1":
+            opponent_policy[d[0]] = [float(d[i]) for i in range(1,5)]
         
 states = []
 index = 0
@@ -50,6 +51,17 @@ for state in opponent_policy.keys():
     states.append(state)
     states_index[state] = index
     index += 1
+
+#for i in opponent_policy.keys():
+#    j = opponent_policy[i]
+#    k = 0
+#    if i[6] == "2":
+#        k = i[2:4] + i[:2] + i[4:6] + "1"
+#    else:
+#        k = i[2:4] + i[:2] + i[4:6] + "2"
+#    if j != opponent_policy[k]:
+#        print("NOT")
+#        exit()
 
 movement = {0:-1, 1:1, 2:-4, 3:4}
 
@@ -93,10 +105,11 @@ for s in range(numStates-1):  # change it to range(numStates-1)
                 else:
                     next_state = states[s][:2] + str(b2_pos) + states[s][4:]
         elif action == 8:
-            if states[s][6] == '1':
-                next_state = states[s][:6] + "2"
-            else:
-                next_state = states[s][:6] + "1"
+            #if states[s][6] == '1':
+            #    next_state = states[s][:6] + "2"
+            #else:
+            #    next_state = states[s][:6] + "1"
+            next_state = states[s][2:4] + states[s][:2] + states[s][4:]
         elif action == 9:
             next_state = states[s]
         for r_action in range(4):
@@ -123,7 +136,7 @@ for s in range(numStates-1):  # change it to range(numStates-1)
                     t1 = (1-p)*opponent_policy[states[s]][r_action]
                     t2 = p*opponent_policy[states[s]][r_action]
                 r1 = 0
-                r2 = -10
+                r2 = 0
             elif action in range(4,8): # b2 moves 
                 if states[s][6] == "2":
                     t1 = (1-2*p)
@@ -137,7 +150,7 @@ for s in range(numStates-1):  # change it to range(numStates-1)
                     t1 = (1-p)*opponent_policy[states[s]][r_action]
                     t2 = p*opponent_policy[states[s]][r_action]
                 r1 = 0
-                r2 = -10
+                r2 = 0
             elif action == 8:   # pass
                 b1 = int(states[s][:2])
                 b2 = int(states[s][2:4])
@@ -162,7 +175,7 @@ for s in range(numStates-1):  # change it to range(numStates-1)
                 t1 = t1 * opponent_policy[states[s]][r_action]
                 t2 = t2 * opponent_policy[states[s]][r_action]
                 r1 = 0
-                r2 = -10
+                r2 = 0
             elif action == 9:
                 shooting_x = 0
                 if states[s][6] == "1":
@@ -170,17 +183,15 @@ for s in range(numStates-1):  # change it to range(numStates-1)
                 else:
                     shooting_x = x_corr(int(states[s][2:4]))
                 r_next = int(next_state1[4:6])
-                t2 = q - 0.2*(3-shooting_x)
-                t1 = 1-t2
+                t1 = q - 0.2*(3-shooting_x)
+                t2 = 1-t1
                 if r_next == 8 or r_next == 12:
-                    t2 = t2 * 0.5
-                    t1 = 1-t2
+                    t1 = t1 * 0.5
+                    t2 = 1-t1
                 t1 = t1 * opponent_policy[states[s]][r_action]
                 t2 = t2 * opponent_policy[states[s]][r_action]
-                r1 = 0
-                r2 = 100
-            #print("transition", states[s], action, r_action, next_state1, r1, t1)
-            #print("transition", states[s], action, r_action, endStates[0], r2, t2)
+                r1 = 1
+                r2 = 0
             if t1 != 0:
                 print("transition", s, action, states_index[next_state1], r1, t1)
             if t2 != 0:
