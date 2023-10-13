@@ -76,7 +76,7 @@ def policy_evaluation(numStates, numActions, T, R, gamma, policy_file):
 
 parser = argparse.ArgumentParser(description='MDP Planner')
 parser.add_argument("--mdp", type=str, help="Path to the input MDP file", required=True)
-parser.add_argument("--algorithm", choices=['vi', 'hpi', 'lp'], help="Algorithm: vi, hpi, or lp", default='vi',required=False)
+parser.add_argument("--algorithm", choices=['vi', 'hpi', 'lp'], help="Algorithm: vi, hpi, or lp", default='hpi',required=False)
 parser.add_argument("--policy", type=str, help="Path to the policy", required=False)
 
 args = parser.parse_args()
@@ -100,8 +100,8 @@ with open(mdp_file, 'r') as fp:
             numStates = int(d[1])
         elif d[0] == "numActions":
             numActions = int(d[1])
-            T = np.zeros((numStates, numActions, numStates), float)
-            R = np.zeros((numStates, numActions, numStates), float)
+            T = np.zeros((numStates, numActions, numStates), np.float32)
+            R = np.zeros((numStates, numActions, numStates), np.float32)
         elif d[0] == "end":
             end = list(map(int, d[1:]))
         elif d[0] == "mdptype":
