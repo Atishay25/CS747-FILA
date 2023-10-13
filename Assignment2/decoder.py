@@ -35,4 +35,4 @@ for state in opponent_policy.keys():
     states.append(state)
 
 for i in range(numStates):
-    print(states[i], policy[i], value_function[i])
+    print(states[i], policy[i], "{:.6f}".format(value_function[i]))

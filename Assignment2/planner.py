@@ -100,8 +100,8 @@ with open(mdp_file, 'r') as fp:
             numStates = int(d[1])
         elif d[0] == "numActions":
             numActions = int(d[1])
-            T = np.zeros((numStates, numActions, numStates), np.float32)
-            R = np.zeros((numStates, numActions, numStates), np.float32)
+            T = np.zeros((numStates, numActions, numStates))
+            R = np.zeros((numStates, numActions, numStates))
         elif d[0] == "end":
             end = list(map(int, d[1:]))
         elif d[0] == "mdptype":
