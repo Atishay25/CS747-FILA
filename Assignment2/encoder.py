@@ -7,6 +7,11 @@ def y_corr(pos):
 def x_corr(pos):
     return (pos-1)%4
 
+# Function to get index of a given state
+def state_to_index(x):
+    b1, b2, r, possession = int(x[:2]), int(x[2:4]), int(x[4:6]), int(x[6])
+    return (b1-1)*512 + (b2-1)*32 + (r-1)*2 + (possession-1)
+
 parser = argparse.ArgumentParser(description="MDP ENCODER")
 parser.add_argument("--opponent", type=str, help="Path to opponent policy file", required=True)
 parser.add_argument("--p", type=float, help="Paramter p", required=True)
@@ -22,7 +27,6 @@ mdptype = "episodic"
 gamma = 1
 
 opponent_policy = dict()
-states_index = dict()
 
 with open(args.opponent, 'r') as fp:
     for line in fp:
@@ -35,7 +39,6 @@ states = []
 index = 0
 for state in opponent_policy.keys():
     states.append(state)
-    states_index[state] = index
     index += 1
 
 movement = {0:-1, 1:1, 2:-4, 3:4}
@@ -95,8 +98,8 @@ for s in range(numStates-2):
                     next_state1 = next_state[:4] + "0" + str(r_pos) + next_state[6]
                 else:
                     next_state1 = next_state[:4] + str(r_pos) + next_state[6]
-            if states_index[next_state1] not in transition.keys():
-                transition[states_index[next_state1]] = 0
+            if state_to_index(next_state1) not in transition.keys():
+                transition[state_to_index(next_state1)] = 0
             if action in range(4): # b1 moves 
                 if states[s][6] == "1":
                     t1 = 1 - 2*p
@@ -148,7 +151,7 @@ for s in range(numStates-2):
             t1 = t1 * opponent_policy[states[s]][r_action]
             t2 = t2 * opponent_policy[states[s]][r_action]
             if action != 9:
-                transition[states_index[next_state1]] += t1
+                transition[state_to_index(next_state1)] += t1
             else:
                 transition[endStates[0]] += t1
             transition[endStates[1]] += t2

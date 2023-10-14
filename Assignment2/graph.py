@@ -36,7 +36,7 @@ q2 = [0.6, 0.7, 0.8, 0.9, 1]
 prob1 = []  
 prob2 = []  
 start_state_ = "0509081"
-print("Start State: ", start_state_)
+print("Start State:", start_state_)
 start_state = state_to_index(start_state_)
 in_file = "data/football/test-1.txt"
 
@@ -54,8 +54,8 @@ for q in q2:
     output.remove('')
     prob2.append(float(output[start_state].split(' ')[2]))
 
-print("Winning Probabilities of Graph1",prob1)
-print("Winning Probabilities of Graph2",prob2)
+print("Winning Probabilities of Graph1 = ",prob1)
+print("Winning Probabilities of Graph2 = ",prob2)
 
 # Graph 1
 plt.figure(1)
@@ -63,9 +63,10 @@ plt.plot(p1, prob1, marker='o', linestyle='-',color='red', label="Start State = 
 plt.title("Probability of Winning vs. p (at q = " + str(q1) + ")")
 plt.xlabel("p")
 plt.ylabel("Probability of Winning")
-plt.savefig("graph1.png")
-plt.grid(True)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tick_params(axis='both', which='major', labelsize=10)
 plt.legend()
+plt.savefig("graph1.png")
 
 # Graph 2
 plt.figure(2)
@@ -73,8 +74,9 @@ plt.plot(q2, prob2, marker='o', linestyle='-', label="Start State = " + start_st
 plt.title("Probability of Winning vs. q (at p = " + str(p2) + ")")
 plt.xlabel("q")
 plt.ylabel("Probability of Winning")
-plt.savefig("graph2.png")
-plt.grid(True)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tick_params(axis='both', which='major', labelsize=10)
 plt.legend()
+plt.savefig("graph2.png")
 
 plt.show()
