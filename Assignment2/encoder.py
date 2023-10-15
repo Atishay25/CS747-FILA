@@ -1,5 +1,4 @@
 import argparse
-import numpy as np
 
 def y_corr(pos):
     return (pos-1)//4

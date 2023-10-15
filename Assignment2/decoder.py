@@ -3,7 +3,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description="DECODER")
 parser.add_argument("--opponent", type=str, help="Path to opponent policy file", required=True)
-parser.add_argument("--value-policy", type=str, help="Value and Policy file (i.e. output of planner.py)", required=True)
+parser.add_argument("--value-policy", dest="value_policy", type=str, help="Value and Policy file (i.e. output of planner.py)", required=True)
 args = parser.parse_args()
 
 opponent_policy = dict()

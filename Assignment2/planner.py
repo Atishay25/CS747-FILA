@@ -4,7 +4,6 @@ import pulp as pl
 
 def value_iteration(numStates, numActions, T, R, gamma):
     V = np.zeros(numStates, dtype=float)
-    theta = 1e-10
     while True:
         d = 0
         for s in range(numStates):
@@ -18,7 +17,7 @@ def value_iteration(numStates, numActions, T, R, gamma):
                 arr[j] = new_sum
             V[s] = np.max(arr)
             d = max(d, abs(v-V[s]))
-        if d < theta:
+        if d < 1e-12:
             break
     #policy = np.argmax(np.sum(T*(R + gamma * V), axis=2), axis=1)
     policy = np.zeros(numStates, dtype=int)
@@ -54,7 +53,7 @@ def hpi(numStates, T, R, gamma):
         policy_stable = True
         for s in range(numStates):
             a = pi[s]
-            #pi[s] = np.argmax(np.sum(T[s,:,:]*(R[s,:,:] + gamma * value), axis=1), axis=0)
+            #pi[s] = np.argmax(np.sum(T[s,:,:]*(R[s,:,:] + gamma * value), axis=1), a
             arr = np.zeros(numActions)
             for j in range(numActions):
                 for k in T[s][j].keys():
@@ -104,7 +103,7 @@ def policy_evaluation(numStates, numActions, T, R, gamma, policy_file):
                 new_sum += T[s][policy[s]][k] * (R[s][policy[s]][k] + gamma * value_function[k])
             value_function[s] = new_sum
             delta = max(delta, abs(v - value_function[s]))
-        if delta < 1e-10:
+        if delta < 1e-12:
             break
     return value_function, policy
 
