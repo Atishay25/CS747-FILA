@@ -1,7 +1,11 @@
 # Task 1
 
 - Sutton & Barto Book, for pseudocode of implementation of vi and hpi algorithms
-- https://coin-or.github.io/pulp/guides/how_to_mip_start.html#supported-solver-apis for pulp
+- https://coin-or.github.io/pulp/guides/how_to_mip_start.html#supported-solver-apis - for pulp
 - Lecture slides, mainly from lecture 8,9,10,11
 
 # Task 2
+
+- https://www.overleaf.com/learn/latex/Algorithms - for report latex\
+- used the same run() function in my graph.py, which was in autograder.py
+- https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html - for plotting graphs 

@@ -39,20 +39,28 @@ start_state_ = "0509081"
 print("Start State:", start_state_)
 start_state = state_to_index(start_state_)
 in_file = "data/football/test-1.txt"
+w_prob = 0
+action = 0
 
 for p in p1:
     print("Running for ", in_file, ' with parameters', p, q1)
     output = run(in_file, p, q1)
     output = output.split('\n')
     output.remove('')
-    prob1.append(float(output[start_state].split(' ')[2]))
+    w_prob = float(output[start_state].split(' ')[2])
+    prob1.append(w_prob)
+    action = int(output[start_state].split(' ')[1])
+    print("Winning Probability:", w_prob, " Optimal Action:", action, "\n")
 
 for q in q2:
     print("Running for ", in_file, ' with parameters', p2, q)
     output = run(in_file, p2, q)
     output = output.split('\n')
     output.remove('')
-    prob2.append(float(output[start_state].split(' ')[2]))
+    w_prob = float(output[start_state].split(' ')[2])
+    prob2.append(w_prob)
+    action = int(output[start_state].split(' ')[1])
+    print("Winning Probability:", w_prob, " Optimal Action:", action, "\n")
 
 print("Winning Probabilities of Graph1 = ",prob1)
 print("Winning Probabilities of Graph2 = ",prob2)
